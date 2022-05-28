@@ -6,14 +6,15 @@
 #define DATABLOCK_HPP
 
 #include <cstddef>
+#include <memory>
 
 struct DataBlock{
-	void *addr;
-	size_t size;
+	char *data;
 	size_t cnt;
 
 	DataBlock();
-	DataBlock(void *addr, size_t size, size_t cnt);
+	DataBlock(char *data, size_t cnt);
+	~DataBlock();
 };
 
 #endif //DATABLOCK_HPP

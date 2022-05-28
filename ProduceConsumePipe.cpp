@@ -3,31 +3,31 @@
 //
 #include "ProduceConsumePipe.hpp"
 
-template<class T>
-ProduceConsumePipe<T>::ProduceConsumePipe(size_t queue_size)
+ProduceConsumePipe::ProduceConsumePipe(BlockReader *producer, BlockHasher *consumer) :
+		_producer(producer), _consumer(consumer)
+{}
+
+void ProduceConsumePipe::produce()
 {
-	_queue(queue_size);
+	while (auto item = _producer->read())
+	{
+		_queue.push_back(std::move(item));
+	}
 }
 
-template<class T>
-void ProduceConsumePipe<T>::produce(std::shared_ptr<T> (*handler)(void))
+void ProduceConsumePipe::consume()
 {
-	while (auto item = handler)
-		while (!_queue->push(item))
-			;
+	while(!_queue.empty())
+	{
+		auto item = std::move(_queue.front());
+		_queue.pop_front();
+		_consumer->hash_md5(*item);
+	}
 }
 
-template<class T>
-void ProduceConsumePipe<T>::consume(void (*handler)(T &))
-{
-	while(auto item = _queue->pop())
-		handler(*item);
-}
-
-template<class T>
-void ProduceConsumePipe<T>::async_consume(void (*handler)(std::shared_ptr<T>), boost::atomic<bool> produce_complete)
+void ProduceConsumePipe::async_consume(boost::atomic<bool> produce_complete)
 {
 	while (!produce_complete)
-		consume(handler);
-	consume(handler);
+		consume();
+	consume();
 }

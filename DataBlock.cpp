@@ -2,10 +2,18 @@
 // Created by youpaw on 5/26/22.
 //
 
+#include <iostream>
 #include "DataBlock.hpp"
 
-DataBlock::DataBlock() : addr(nullptr), size(0), cnt(0)
+DataBlock::DataBlock() : data(nullptr), cnt(0)
 {}
 
-DataBlock::DataBlock(void *addr, size_t size, size_t cnt) : addr(addr), size(size), cnt(cnt)
+DataBlock::DataBlock(char *data, size_t cnt) : data(data), cnt(cnt)
 {}
+
+DataBlock::~DataBlock()
+{
+//	std::cout << "Destruct DataBlock";
+	delete [] data;
+	data = nullptr;
+}

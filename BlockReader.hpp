@@ -7,23 +7,23 @@
 
 #include "DataBlock.hpp"
 #include <memory>
+#include <fstream>
 
 class BlockReader{
-	int _fd = -1;
+	std::ifstream _input;
 	size_t _file_size;
-
-	void *_file_map = nullptr;
-	size_t _offset = 0;
 
 	size_t _block_size;
 	size_t _block_cnt = 0;
 
-	void _map_file(char *file_path);
+	char *_allocate_block() const;
 
 public:
-	BlockReader(char *file_path, size_t block_size);
+	size_t n_blocks;
 
-	std::shared_ptr<DataBlock> read();
+	BlockReader(std::string &file_path, size_t block_size);
+
+	std::unique_ptr<DataBlock> read();
 	size_t count_blocks() const;
 
 	~BlockReader();
