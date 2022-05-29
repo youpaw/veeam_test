@@ -9,12 +9,11 @@
 #include <memory>
 
 struct DataBlock{
-	char *data;
+	std::shared_ptr<char[]> data;
 	size_t cnt;
 
 	DataBlock();
-	DataBlock(char *data, size_t cnt);
-	~DataBlock();
+	DataBlock(size_t block_size, size_t cnt);
 };
 
 #endif //DATABLOCK_HPP

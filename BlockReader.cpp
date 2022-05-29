@@ -28,16 +28,16 @@ size_t BlockReader::count_blocks() const
 	return cnt;
 }
 
-char *BlockReader::_allocate_block() const
+void BlockReader::_allocate_block(DataBlock &block) const
 {
-	char *data = nullptr;
 	unsigned timeout = 1;
 	unsigned step = 5;
-	while (!data)
+	while (true)
 	{
 		try
 		{
-			data = new char[_block_size];
+			block = DataBlock(_block_size, _block_cnt);
+			return ;
 		}
 		catch(...)
 		{
@@ -48,24 +48,22 @@ char *BlockReader::_allocate_block() const
 			step *= 2;
 		}
 	}
-	return data;
 }
 
-std::unique_ptr<DataBlock> BlockReader::read()
+int BlockReader::read(DataBlock &block)
 {
 	if (_block_cnt == n_blocks)
-		return nullptr;
-	auto data = _allocate_block();
-
+		return 0;
+	_allocate_block(block);
+	const auto data = block.data.get();
 	_input.read(data, _block_size);
 	if (!_input)
 	{
 		auto n_bytes = _input.gcount();
 		bzero(data + n_bytes, _block_size - n_bytes);
 	}
-//	auto data_block = DataBlock(data, _block_cnt++);
-//	auto block = std::shared_ptr<DataBlock>(new DataBlock(data, _block_cnt++));
-	return std::make_unique<DataBlock>(data, _block_cnt++);
+	_block_cnt++;
+	return 1;
 }
 
 BlockReader::~BlockReader()

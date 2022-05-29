@@ -9,15 +9,14 @@
 #include "BlockReader.hpp"
 #include "BlockHasher.hpp"
 #include <cstddef>
-#include <list>
+#include <queue>
 #include <mutex>
 #include <boost/atomic.hpp>
 
 class ProduceConsumePipe{
-	std::mutex _sync;
 	BlockReader *_producer;
 	BlockHasher *_consumer;
-	std::list<std::unique_ptr<DataBlock>> _queue;
+	std::queue<DataBlock> _queue;
 public:
 
 	explicit ProduceConsumePipe(BlockReader *producer, BlockHasher *consumer);

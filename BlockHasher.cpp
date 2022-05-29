@@ -23,7 +23,7 @@ void BlockHasher::hash_md5(const DataBlock &block)
 {
 	md5 hash;
 	md5::digest_type digest;
-	hash.process_bytes(block.data, _block_size);
+	hash.process_bytes(block.data.get(), _block_size);
 	hash.get_digest(digest);
 
 	const auto char_digest = reinterpret_cast<const char *>(&digest);

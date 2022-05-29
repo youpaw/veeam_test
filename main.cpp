@@ -6,12 +6,6 @@
 #include <iostream>
 #include <queue>
 
-std::shared_ptr<DataBlock> get()
-{
-	std::shared_ptr<DataBlock> sp(new DataBlock(new char[10], 0));
-	return sp;
-}
-
 int main(int ac, char **av) {
     if (ac != 4)
     {
@@ -25,12 +19,5 @@ int main(int ac, char **av) {
 	ProduceConsumePipe pc_pipe(&reader, &hasher);
 	pc_pipe.produce();
 	pc_pipe.consume();
-//	std::queue<std::shared_ptr<DataBlock>> queue;
-//	auto sp = get();
-//	queue.push(sp);
-//	sp = nullptr;
-//	auto sp1 = queue.front();
-//	queue.pop();
-//	sp1 = nullptr;
 	return 0;
 }

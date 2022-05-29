@@ -8,12 +8,7 @@
 DataBlock::DataBlock() : data(nullptr), cnt(0)
 {}
 
-DataBlock::DataBlock(char *data, size_t cnt) : data(data), cnt(cnt)
-{}
-
-DataBlock::~DataBlock()
+DataBlock::DataBlock(size_t block_size, size_t cnt) : cnt(cnt)
 {
-//	std::cout << "Destruct DataBlock";
-	delete [] data;
-	data = nullptr;
+	data = std::shared_ptr<char[]>(new char[block_size]);
 }

@@ -9,9 +9,10 @@ ProduceConsumePipe::ProduceConsumePipe(BlockReader *producer, BlockHasher *consu
 
 void ProduceConsumePipe::produce()
 {
-	while (auto item = _producer->read())
+	DataBlock item;
+	while (_producer->read(item))
 	{
-		_queue.push_back(std::move(item));
+		_queue.push(item);
 	}
 }
 
@@ -19,9 +20,9 @@ void ProduceConsumePipe::consume()
 {
 	while(!_queue.empty())
 	{
-		auto item = std::move(_queue.front());
-		_queue.pop_front();
-		_consumer->hash_md5(*item);
+		auto item = _queue.front();
+		_queue.pop();
+		_consumer->hash_md5(item);
 	}
 }
 

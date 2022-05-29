@@ -16,14 +16,14 @@ class BlockReader{
 	size_t _block_size;
 	size_t _block_cnt = 0;
 
-	char *_allocate_block() const;
+	void _allocate_block(DataBlock &block) const;
 
 public:
 	size_t n_blocks;
 
 	BlockReader(std::string &file_path, size_t block_size);
 
-	std::unique_ptr<DataBlock> read();
+	int read(DataBlock &block);
 	size_t count_blocks() const;
 
 	~BlockReader();
