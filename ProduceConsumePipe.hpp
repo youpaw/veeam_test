@@ -5,25 +5,26 @@
 #ifndef PRODUCECONSUMEPIPE_HPP
 #define PRODUCECONSUMEPIPE_HPP
 
-#include "DataBlock.hpp"
 #include "BlockReader.hpp"
 #include "BlockHasher.hpp"
+#include "DataBlock.hpp"
 #include <cstddef>
+#include <memory>
 #include <queue>
 #include <mutex>
 #include <boost/atomic.hpp>
 
 class ProduceConsumePipe{
-	BlockReader *_producer;
-	BlockHasher *_consumer;
+	std::shared_ptr<BlockReader> _producer;
+	std::shared_ptr<BlockHasher> _consumer;
 	std::queue<DataBlock> _queue;
+	std::mutex _sync;
 public:
 
-	explicit ProduceConsumePipe(BlockReader *producer, BlockHasher *consumer);
+	ProduceConsumePipe(std::shared_ptr<BlockReader> &producer, std::shared_ptr<BlockHasher> &consumer);
 	void produce();
 	void consume();
-	void async_consume(boost::atomic<bool> produce_complete);
+	void async_consume(boost::atomic<bool> &produce_complete);
 };
-
 
 #endif //PRODUCECONSUMEPIPE_HPP

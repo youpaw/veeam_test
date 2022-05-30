@@ -15,16 +15,17 @@ class BlockHasher{
 	size_t _block_size;
 	size_t _n_blocks;
 
-	char *_hash_sum;
+	std::unique_ptr<char[]> _hash_sum;
 	const size_t _hash_size = sizeof(md5::digest_type);
-	size_t _sum_size;
 
 public:
-    BlockHasher(size_t block_size, size_t n_blocks);
+	const size_t sum_size;
+
+	BlockHasher(size_t block_size, size_t n_blocks);
 
 	void hash_md5(const DataBlock &block);
+	const char *get_sum();
 
-	~BlockHasher();
 };
 
 #endif //BLOCKHASHER_HPP

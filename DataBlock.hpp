@@ -9,7 +9,7 @@
 #include <memory>
 
 struct DataBlock{
-	std::shared_ptr<char[]> data;
+	std::unique_ptr<char[]> data;
 	size_t cnt;
 
 	DataBlock();
