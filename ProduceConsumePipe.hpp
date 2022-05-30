@@ -5,21 +5,26 @@
 #ifndef PRODUCECONSUMEPIPE_HPP
 #define PRODUCECONSUMEPIPE_HPP
 
+#include "BlockReader.hpp"
+#include "BlockHasher.hpp"
+#include "DataBlock.hpp"
 #include <cstddef>
-#include <boost/atomic.hpp>
-#include <boost/lockfree/queue.hpp>
+#include <memory>
+#include <queue>
+#include <mutex>
+#include <atomic>
 
-namespace blf = boost::lockfree;
-
-template <class T>
 class ProduceConsumePipe{
-	blf::queue<std::shared_ptr<T>> _queue;
+	std::shared_ptr<BlockReader> _producer;
+	std::shared_ptr<BlockHasher> _consumer;
+	std::queue<DataBlock> _queue;
+	std::mutex _sync;
 public:
-	explicit ProduceConsumePipe(size_t queue_size = 128);
-	void produce(std::shared_ptr<T> (*handler)(void));
-	void consume(void (*handler)(T &));
-	void async_consume(void (*handler)(std::shared_ptr<T>), boost::atomic<bool> produce_complete);
-};
 
+	ProduceConsumePipe(std::shared_ptr<BlockReader> &producer, std::shared_ptr<BlockHasher> &consumer);
+	void produce();
+	void consume();
+	void async_consume(std::atomic<bool> &produce_complete);
+};
 
 #endif //PRODUCECONSUMEPIPE_HPP

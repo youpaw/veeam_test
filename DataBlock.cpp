@@ -4,8 +4,10 @@
 
 #include "DataBlock.hpp"
 
-DataBlock::DataBlock() : addr(nullptr), size(0), cnt(0)
+DataBlock::DataBlock() : data(nullptr), cnt(0)
 {}
 
-DataBlock::DataBlock(void *addr, size_t size, size_t cnt) : addr(addr), size(size), cnt(cnt)
-{}
+DataBlock::DataBlock(size_t block_size, size_t cnt) : cnt(cnt)
+{
+	data = std::move(std::unique_ptr<char[]>(new char[block_size]));
+}

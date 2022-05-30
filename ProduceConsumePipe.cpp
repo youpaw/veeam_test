@@ -3,31 +3,44 @@
 //
 #include "ProduceConsumePipe.hpp"
 
-template<class T>
-ProduceConsumePipe<T>::ProduceConsumePipe(size_t queue_size)
+ProduceConsumePipe::ProduceConsumePipe(std::shared_ptr<BlockReader> &producer,
+										  std::shared_ptr<BlockHasher> &consumer) : _producer(producer),
+										  											_consumer(consumer)
 {
-	_queue(queue_size);
+	_queue = std::move(std::queue<DataBlock>());
 }
 
-template<class T>
-void ProduceConsumePipe<T>::produce(std::shared_ptr<T> (*handler)(void))
+void ProduceConsumePipe::produce()
 {
-	while (auto item = handler)
-		while (!_queue->push(item))
-			;
+	DataBlock item;
+	while (_producer->read(item))
+	{
+		_sync.lock();
+		_queue.push(std::move(item));
+		_sync.unlock();
+	}
 }
 
-template<class T>
-void ProduceConsumePipe<T>::consume(void (*handler)(T &))
+void ProduceConsumePipe::consume()
 {
-	while(auto item = _queue->pop())
-		handler(*item);
+	while(true)
+	{
+		_sync.lock();
+		if (_queue.empty())
+		{
+			_sync.unlock();
+			return;
+		}
+		auto item = std::move(_queue.front());
+		_queue.pop();
+		_sync.unlock();
+		_consumer->hash_sha256(item);
+	}
 }
 
-template<class T>
-void ProduceConsumePipe<T>::async_consume(void (*handler)(std::shared_ptr<T>), boost::atomic<bool> produce_complete)
+void ProduceConsumePipe::async_consume(std::atomic<bool> &produce_complete)
 {
 	while (!produce_complete)
-		consume(handler);
-	consume(handler);
+		consume();
+	consume();
 }
