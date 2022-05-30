@@ -21,7 +21,7 @@ public:
 
 	BlockHasher(size_t block_size, size_t n_blocks);
 	static void bytes_to_hex(const unsigned char *bytes, size_t size, char *dest);
-	void hash_sha256(const DataBlock &block);
+	void hash_sha1(const DataBlock &block);
 	const char *get_sum();
 
 };

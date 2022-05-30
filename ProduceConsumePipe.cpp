@@ -34,7 +34,7 @@ void ProduceConsumePipe::consume()
 		auto item = std::move(_queue.front());
 		_queue.pop();
 		_sync.unlock();
-		_consumer->hash_sha256(item);
+		_consumer->hash_sha1(item);
 	}
 }
 

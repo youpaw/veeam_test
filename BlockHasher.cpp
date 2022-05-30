@@ -31,7 +31,7 @@ void BlockHasher::bytes_to_hex(const unsigned char *bytes, size_t size, char *de
 	}
 }
 
-void BlockHasher::hash_sha256(const DataBlock &block)
+void BlockHasher::hash_sha1(const DataBlock &block)
 {
 	unsigned char digest[SHA_DIGEST_LENGTH];
 	SHA1(reinterpret_cast<const unsigned char *>(block.data.get()), _block_size, digest);
