@@ -7,23 +7,21 @@
 
 #include "DataBlock.hpp"
 #include <memory>
-#include <boost/uuid/detail/md5.hpp>
-
-using boost::uuids::detail::md5;
+#include <openssl/sha.h>
 
 class BlockHasher{
 	size_t _block_size;
 	size_t _n_blocks;
 
 	std::unique_ptr<char[]> _hash_sum;
-	const size_t _hash_size = sizeof(md5::digest_type);
+	const size_t _hash_size = SHA_DIGEST_LENGTH * 2;
 
 public:
 	const size_t sum_size;
 
 	BlockHasher(size_t block_size, size_t n_blocks);
-
-	void hash_md5(const DataBlock &block);
+	static void bytes_to_hex(const unsigned char *bytes, size_t size, char *dest);
+	void hash_sha256(const DataBlock &block);
 	const char *get_sum();
 
 };

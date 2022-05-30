@@ -12,7 +12,7 @@
 #include <memory>
 #include <queue>
 #include <mutex>
-#include <boost/atomic.hpp>
+#include <atomic>
 
 class ProduceConsumePipe{
 	std::shared_ptr<BlockReader> _producer;
@@ -24,7 +24,7 @@ public:
 	ProduceConsumePipe(std::shared_ptr<BlockReader> &producer, std::shared_ptr<BlockHasher> &consumer);
 	void produce();
 	void consume();
-	void async_consume(boost::atomic<bool> &produce_complete);
+	void async_consume(std::atomic<bool> &produce_complete);
 };
 
 #endif //PRODUCECONSUMEPIPE_HPP

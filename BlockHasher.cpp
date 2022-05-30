@@ -4,10 +4,9 @@
 
 #include "BlockHasher.hpp"
 #include <stdexcept>
-#include <boost/algorithm/hex.hpp>
 
 BlockHasher::BlockHasher(size_t block_size, size_t n_blocks) : _block_size(block_size), _n_blocks(n_blocks),
-															   sum_size(_n_blocks * _hash_size * 2)
+															   sum_size(_n_blocks * _hash_size)
 {
 	try
 	{
@@ -20,19 +19,30 @@ BlockHasher::BlockHasher(size_t block_size, size_t n_blocks) : _block_size(block
 	}
 }
 
-void BlockHasher::hash_md5(const DataBlock &block)
+void BlockHasher::bytes_to_hex(const unsigned char *bytes, size_t size, char *dest)
 {
-	md5 hash;
-	md5::digest_type digest;
-	hash.process_bytes(block.data.get(), _block_size);
-	hash.get_digest(digest);
-	const auto char_digest = reinterpret_cast<const char *>(&digest);
-	char *result_addr = _hash_sum.get() + block.cnt * _hash_size;
-	boost::algorithm::hex(char_digest, char_digest + _hash_size, result_addr);
+	static const char hex_chars[] = {"0123456789abcdef"};
+
+	for( auto i = 0; i < size; ++i )
+	{
+		dest[0] = hex_chars[ ( bytes[i] & 0xF0 ) >> 4 ];
+		dest[1] = hex_chars[ ( bytes[i] & 0x0F ) >> 0 ];
+		dest += 2;
+	}
+}
+
+void BlockHasher::hash_sha256(const DataBlock &block)
+{
+	unsigned char digest[SHA_DIGEST_LENGTH];
+	SHA1(reinterpret_cast<const unsigned char *>(block.data.get()), _block_size, digest);
+	auto result = _hash_sum.get() + block.cnt * _hash_size;
+	bytes_to_hex(digest, SHA_DIGEST_LENGTH, result);
 }
 
 const char *BlockHasher::get_sum()
 {
 	return _hash_sum.get();
 }
+
+
 

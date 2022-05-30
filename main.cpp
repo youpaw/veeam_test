@@ -3,7 +3,7 @@
 #include "BlockHasher.hpp"
 #include "FileWriter.hpp"
 #include "ProduceConsumePipe.hpp"
-#include <boost/atomic.hpp>
+#include <atomic>
 #include <thread>
 #include <vector>
 
@@ -15,7 +15,7 @@ int main(int ac, char **av) {
 	auto hasher = std::make_shared<BlockHasher>(args.block_size, reader->n_blocks);
 
 	ProduceConsumePipe pc_pipe(reader, hasher);
-	boost::atomic<bool> produce_complete = false;
+	std::atomic<bool> produce_complete = false;
 
 	auto producer_func = [&pc_pipe](){pc_pipe.produce();};
 	auto consumer_func = [&pc_pipe, &produce_complete](){pc_pipe.async_consume(produce_complete);};

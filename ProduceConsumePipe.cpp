@@ -34,11 +34,11 @@ void ProduceConsumePipe::consume()
 		auto item = std::move(_queue.front());
 		_queue.pop();
 		_sync.unlock();
-		_consumer->hash_md5(item);
+		_consumer->hash_sha256(item);
 	}
 }
 
-void ProduceConsumePipe::async_consume(boost::atomic<bool> &produce_complete)
+void ProduceConsumePipe::async_consume(std::atomic<bool> &produce_complete)
 {
 	while (!produce_complete)
 		consume();
