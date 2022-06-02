@@ -7,12 +7,11 @@
 
 #include <string>
 #include <cstddef>
-#define MEGABYTE 1048576
 
 struct ArgParser{
-	std::string input_file;
-	std::string output_file;
-	size_t block_size;
+	std::string input_file{};
+	std::string output_file{};
+	size_t block_size = 0;
 	ArgParser(int ac, char **av);
 	static void print_usage();
 };

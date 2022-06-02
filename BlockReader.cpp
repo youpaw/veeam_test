@@ -4,20 +4,24 @@
 
 #include "BlockReader.hpp"
 #include <thread>
-#include <exception>
 #include <cstring>
 #include <filesystem>
 
-BlockReader::BlockReader(std::string &file_path, size_t block_size) : _block_size(block_size)
+BlockReader::BlockReader(std::string &file_path, size_t block_size) :
+_input(std::ifstream(file_path, std::ios::in | std::ios::binary))
 {
-	_input = std::ifstream(file_path, std::ios::in | std::ios::binary);
+	if (block_size)
+		_block_size = block_size;
 	if (!_input)
 	{
-		perror(file_path.c_str());
-		throw std::runtime_error("Cannot open source file for reading");
+		perror("Cannot open source file for reading");
+		exit(errno);
 	}
 	if (!std::filesystem::is_regular_file(file_path))
-		throw std::runtime_error("Provided source path is not a file");
+	{
+		perror("Provided source path is not a file");
+		exit(EINVAL);
+	}
 	_input.seekg(0, _input.end);
 	_file_size = _input.tellg();
 	_input.seekg(0, _input.beg);
@@ -36,7 +40,7 @@ size_t BlockReader::count_blocks() const
 	return cnt;
 }
 
-void BlockReader::_allocate_block(DataBlock &block) const
+DataBlock BlockReader::_allocate_block() const
 {
 	unsigned timeout = 1;
 	unsigned step = 5;
@@ -44,15 +48,14 @@ void BlockReader::_allocate_block(DataBlock &block) const
 	{
 		try
 		{
-			block = DataBlock(_block_size, _block_cnt);
-			return ;
+			return {_block_size, _block_cnt};
 		}
 		catch(...)
 		{
 			if (timeout > 10000)
 			{
-				perror(nullptr);
-				std::throw_with_nested(std::runtime_error("Block allocation failed"));
+				perror("Block allocation failed");
+				exit(errno);
 			}
 			std::this_thread::sleep_for(std::chrono::microseconds(timeout) );
 			timeout += step;
@@ -61,11 +64,14 @@ void BlockReader::_allocate_block(DataBlock &block) const
 	}
 }
 
-int BlockReader::read(DataBlock &block)
+bool BlockReader::next() const
 {
-	if (_block_cnt == n_blocks)
-		return 0;
-	_allocate_block(block);
+	return _block_cnt < n_blocks;
+};
+
+DataBlock BlockReader::read()
+{
+	auto block = _allocate_block();
 	const auto data = block.data.get();
 	_input.read(data, _block_size);
 	if (!_input)
@@ -74,12 +80,10 @@ int BlockReader::read(DataBlock &block)
 		bzero(data + n_bytes, _block_size - n_bytes);
 	}
 	_block_cnt++;
-	return 1;
+	return block;
 }
 
 BlockReader::~BlockReader()
 {
 	_input.close();
-};
-
-
+}

@@ -3,6 +3,7 @@
 //
 
 #include "ArgParser.hpp"
+#include "main.hpp"
 #include <iostream>
 
 ArgParser::ArgParser(int ac, char **av)
@@ -14,7 +15,8 @@ ArgParser::ArgParser(int ac, char **av)
 	}
 	input_file = std::string(av[1]);
 	output_file = std::string(av[2]);
-	block_size = ac == 3 ? MEGABYTE : std::strtoull(av[3], nullptr, 10) * MEGABYTE;
+	if (ac == 4)
+		block_size = std::strtoull(av[3], nullptr, 10) * MEGABYTE;
 }
 
 void ArgParser::print_usage()

@@ -5,17 +5,18 @@
 #include "BlockHasher.hpp"
 #include <stdexcept>
 
-BlockHasher::BlockHasher(size_t block_size, size_t n_blocks) : _block_size(block_size), _n_blocks(n_blocks),
-															   sum_size(_n_blocks * _hash_size)
+BlockHasher::BlockHasher(size_t block_size, size_t n_blocks) : _n_blocks(n_blocks), sum_size(_n_blocks * _hash_size)
 {
+	if (block_size)
+		_block_size = block_size;
 	try
 	{
 		_hash_sum = std::unique_ptr<char[]>(new char[sum_size]);
 	}
 	catch (...)
 	{
-		perror(nullptr);
-		std::throw_with_nested(std::runtime_error("Hash sum allocation failed"));
+		perror("Hash sum allocation failed");
+		exit(errno);
 	}
 }
 

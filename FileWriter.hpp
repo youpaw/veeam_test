@@ -8,7 +8,7 @@
 #include <fstream>
 
 class FileWriter{
-	std::ofstream _output;
+	std::ofstream _output{};
 
 public:
 	explicit FileWriter(std::string &file_path);

@@ -6,18 +6,19 @@
 #define BLOCKHASHER_HPP
 
 #include "DataBlock.hpp"
+#include "main.hpp"
 #include <memory>
 #include <openssl/sha.h>
 
 class BlockHasher{
-	size_t _block_size;
-	size_t _n_blocks;
+	size_t _block_size = MEGABYTE;
+	size_t _n_blocks = 0;
 
-	std::unique_ptr<char[]> _hash_sum;
+	std::unique_ptr<char[]> _hash_sum{};
 	const size_t _hash_size = SHA_DIGEST_LENGTH * 2;
 
 public:
-	const size_t sum_size;
+	const size_t sum_size = 0;
 
 	BlockHasher(size_t block_size, size_t n_blocks);
 	static void bytes_to_hex(const unsigned char *bytes, size_t size, char *dest);

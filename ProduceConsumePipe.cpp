@@ -5,18 +5,16 @@
 
 ProduceConsumePipe::ProduceConsumePipe(std::shared_ptr<BlockReader> &producer,
 										  std::shared_ptr<BlockHasher> &consumer) : _producer(producer),
-										  											_consumer(consumer)
-{
-	_queue = std::move(std::queue<DataBlock>());
-}
+										  											_consumer(consumer),
+																				  	_queue(std::queue<DataBlock>())
+{}
 
 void ProduceConsumePipe::produce()
 {
-	DataBlock item;
-	while (_producer->read(item))
+	while (_producer->next())
 	{
 		_sync.lock();
-		_queue.push(std::move(item));
+		_queue.push(_producer->read());
 		_sync.unlock();
 	}
 }

@@ -9,8 +9,8 @@
 #include <memory>
 
 struct DataBlock{
-	std::unique_ptr<char[]> data;
-	size_t cnt;
+	std::unique_ptr<char[]> data{};
+	size_t cnt = 0;
 
 	DataBlock();
 	DataBlock(size_t block_size, size_t cnt);
