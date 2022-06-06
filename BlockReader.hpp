@@ -17,8 +17,6 @@ class BlockReader{
 	size_t _block_size = MEGABYTE;
 	size_t _block_cnt = 0;
 
-	DataBlock _allocate_block() const;
-
 public:
 	size_t n_blocks = 0;
 

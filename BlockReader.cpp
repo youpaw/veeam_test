@@ -3,7 +3,6 @@
 //
 
 #include "BlockReader.hpp"
-#include <thread>
 #include <cstring>
 #include <filesystem>
 
@@ -40,38 +39,14 @@ size_t BlockReader::count_blocks() const
 	return cnt;
 }
 
-DataBlock BlockReader::_allocate_block() const
-{
-	unsigned timeout = 1;
-	unsigned step = 5;
-	while (true)
-	{
-		try
-		{
-			return {_block_size, _block_cnt};
-		}
-		catch(...)
-		{
-			if (timeout > 10000)
-			{
-				perror("Block allocation failed");
-				exit(errno);
-			}
-			std::this_thread::sleep_for(std::chrono::microseconds(timeout) );
-			timeout += step;
-			step *= 2;
-		}
-	}
-}
-
 bool BlockReader::next() const
 {
 	return _block_cnt < n_blocks;
-};
+}
 
 DataBlock BlockReader::read()
 {
-	auto block = _allocate_block();
+	auto block = DataBlock(_block_size, _block_cnt);
 	const auto data = block.data.get();
 	_input.read(data, _block_size);
 	if (!_input)
